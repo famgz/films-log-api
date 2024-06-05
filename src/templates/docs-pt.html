@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="pt">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Documentação da API Flask</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        line-height: 1.6;
+      }
+      .container {
+        width: 80%;
+        margin: auto;
+      }
+      h1,
+      h2,
+      h3,
+      h4 {
+        color: #333;
+      }
+      .endpoint {
+        margin-bottom: 2em;
+      }
+      .endpoint-method {
+        font-weight: bold;
+      }
+      .code {
+        background: #f4f4f4;
+        padding: 0.5em;
+        border-left: 3px solid #ccc;
+        margin: 0.5em 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Documentação da API Flask</h1>
+      <p>
+        Esta é a documentação para a API Flask. A API permite que os usuários
+        gerenciem usuários, filmes, resenhas, avaliações e favoritos.
+      </p>
+
+      <h2>Endpoints</h2>
+
+      <div class="endpoint">
+        <h3>Endpoints de Usuário</h3>
+
+        <div class="endpoint-method">POST /user</div>
+        <p>Cria um novo usuário.</p>
+        <div class="code">
+          Parâmetros da Requisição (form-data):
+          <ul>
+            <li>username: string</li>
+            <li>email: string</li>
+            <li>password: string</li>
+          </ul>
+          Resposta:
+          <pre>{"message": "User criado com sucesso"}</pre>
+        </div>
+
+        <div class="endpoint-method">GET /user/&lt;int:id&gt;</div>
+        <p>Obter um usuário pelo ID.</p>
+        <div class="code">
+          Resposta:
+          <pre>
+{
+    "id": int,
+    "username": string,
+    "email": string,
+    "password": string
+}
+                </pre
+          >
+        </div>
+
+        <div class="endpoint-method">PUT /user/&lt;int:id&gt;</div>
+        <p>Atualizar um usuário pelo ID.</p>
+        <div class="code">
+          Parâmetros da Requisição (form-data):
+          <ul>
+            <li>username: string</li>
+            <li>email: string</li>
+            <li>password: string</li>
+          </ul>
+          Resposta:
+          <pre>{"message": "User atualizado com sucesso"}</pre>
+        </div>
+
+        <div class="endpoint-method">DELETE /user/&lt;int:id&gt;</div>
+        <p>Excluir um usuário pelo ID.</p>
+        <div class="code">
+          Resposta:
+          <pre>{"message": "User excluído com sucesso"}</pre>
+        </div>
+      </div>
+
+      <div class="endpoint">
+        <h3>Endpoints de Filme</h3>
+
+        <div class="endpoint-method">POST /film</div>
+        <p>Cria um novo filme.</p>
+        <div class="code">
+          Parâmetros da Requisição (form-data):
+          <ul>
+            <li>title: string</li>
+            <li>year: int</li>
+            <li>director: string</li>
+            <li>duration: int</li>
+          </ul>
+          Resposta:
+          <pre>{"message": "Filme adicionado com sucesso"}</pre>
+        </div>
+
+        <div class="endpoint-method">GET /film/all</div>
+        <p>Obter todos os filmes.</p>
+        <div class="code">
+          Resposta:
+          <pre>
+[
+    {
+        "id": int,
+        "title": string,
+        "year": int,
+        "director": string,
+        "duration": int
+    },
+    ...
+]
+                </pre
+          >
+        </div>
+
+        <div class="endpoint-method">GET /film/&lt;int:id&gt;</div>
+        <p>Obter um filme pelo ID.</p>
+        <div class="code">
+          Resposta:
+          <pre>
+{
+    "id": int,
+    "title": string,
+    "year": int,
+    "director": string,
+    "duration": int
+}
+                </pre
+          >
+        </div>
+
+        <div class="endpoint-method">PUT /film/&lt;int:id&gt;</div>
+        <p>Atualizar um filme pelo ID.</p>
+        <div class="code">
+          Parâmetros da Requisição (form-data):
+          <ul>
+            <li>title: string</li>
+            <li>year: int</li>
+            <li>director: string</li>
+            <li>duration: int</li>
+          </ul>
+          Resposta:
+          <pre>{"message": "Filme atualizado com sucesso"}</pre>
+        </div>
+
+        <div class="endpoint-method">DELETE /film/&lt;int:id&gt;</div>
+        <p>Excluir um filme pelo ID.</p>
+        <div class="code">
+          Resposta:
+          <pre>{"message": "Filme excluído com sucesso"}</pre>
+        </div>
+      </div>
+
+      <div class="endpoint">
+        <h3>Endpoints de Resenha</h3>
+
+        <div class="endpoint-method">
+          POST /user/&lt;username&gt;/film/&lt;int:film_id&gt;/review
+        </div>
+        <p>Cria uma nova resenha para um filme por um usuário.</p>
+        <div class="code">
+          Parâmetros da Requisição (form-data):
+          <ul>
+            <li>review: string</li>
+          </ul>
+          Resposta:
+          <pre>{"message": "Review adicionado com sucesso"}</pre>
+        </div>
+
+        <div class="endpoint-method">
+          GET /user/&lt;username&gt;/film/&lt;int:film_id&gt;/review
+        </div>
+        <p>Obter uma resenha para um filme por um usuário.</p>
+        <div class="code">
+          Resposta:
+          <pre>
+{
+    "user_id": int,
+    "film_id": int,
+    "review": string
+}
+                </pre
+          >
+        </div>
+
+        <div class="endpoint-method">
+          PUT /user/&lt;username&gt;/film/&lt;int:film_id&gt;/review
+        </div>
+        <p>Atualizar uma resenha para um filme por um usuário.</p>
+        <div class="code">
+          Parâmetros da Requisição (form-data):
+          <ul>
+            <li>review: string</li>
+          </ul>
+          Resposta:
+          <pre>{"message": "Review atualizado com sucesso"}</pre>
+        </div>
+
+        <div class="endpoint-method">
+          DELETE /user/&lt;username&gt;/film/&lt;int:film_id&gt;/review
+        </div>
+        <p>Excluir uma resenha para um filme por um usuário.</p>
+        <div class="code">
+          Resposta:
+          <pre>{"message": "Review excluído com sucesso"}</pre>
+        </div>
+      </div>
+
+      <div class="endpoint">
+        <h3>Endpoints de Avaliação</h3>
+
+        <div class="endpoint-method">
+          POST /user/&lt;username&gt;/film/&lt;int:film_id&gt;/rating
+        </div>
+        <p>Cria uma nova avaliação para um filme por um usuário.</p>
+        <div class="code">
+          Parâmetros da Requisição (form-data):
+          <ul>
+            <li>rating: int (entre 1 e 10)</li>
+          </ul>
+          Resposta:
+          <pre>{"message": "Rating adicionado com sucesso"}</pre>
+        </div>
+
+        <div class="endpoint-method">
+          GET /user/&lt;username&gt;/film/&lt;int:film_id&gt;/rating
+        </div>
+        <p>Obter uma avaliação para um filme por um usuário.</p>
+        <div class="code">
+          Resposta:
+          <pre>
+{
+    "user_id": int,
+    "film_id": int,
+    "rating": int
+}
+                </pre
+          >
+        </div>
+
+        <div class="endpoint-method">
+          PUT /user/&lt;username&gt;/film/&lt;int:film_id&gt;/rating
+        </div>
+        <p>Atualizar uma avaliação para um filme por um usuário.</p>
+        <div class="code">
+          Parâmetros da Requisição (form-data):
+          <ul>
+            <li>rating: int (entre 1 e 10)</li>
+          </ul>
+          Resposta:
+          <pre>{"message": "Rating atualizado com sucesso"}</pre>
+        </div>
+
+        <div class="endpoint-method">
+          DELETE /user/&lt;username&gt;/film/&lt;int:film_id&gt;/rating
+        </div>
+        <p>Excluir uma avaliação para um filme por um usuário.</p>
+        <div class="code">
+          Resposta:
+          <pre>{"message": "Rating excluído com sucesso"}</pre>
+        </div>
+      </div>
+
+      <div class="endpoint">
+        <h3>Endpoints de Favoritos</h3>
+
+        <div class="endpoint-method">
+          POST /user/&lt;username&gt;/film/&lt;int:film_id&gt;/favorite
+        </div>
+        <p>Adicionar um filme aos favoritos de um usuário.</p>
+        <div class="code">
+          Resposta:
+          <pre>{"message": "Favorite adicionado com sucesso"}</pre>
+        </div>
+
+        <div class="endpoint-method">
+          GET /user/&lt;username&gt;/film/&lt;int:film_id&gt;/favorite
+        </div>
+        <p>Obter um favorito para um filme por um usuário.</p>
+        <div class="code">
+          Resposta:
+          <pre>
+{
+    "user_id": int,
+    "film_id": int,
+    "favorite": boolean
+}
+                </pre
+          >
+        </div>
+
+        <div class="endpoint-method">
+          DELETE /user/&lt;username&gt;/film/&lt;int:film_id&gt;/favorite
+        </div>
+        <p>Excluir um favorito para um filme por um usuário.</p>
+        <div class="code">
+          Resposta:
+          <pre>{"message": "Favorite excluído com sucesso"}</pre>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
