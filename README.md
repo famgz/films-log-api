@@ -53,6 +53,7 @@ Esta documentação fornece uma visão geral dos endpoints disponíveis e como u
 4. Execute a aplicação:
 
    ```sh
+   cd src
    flask run
    ```
 
