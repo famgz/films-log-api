@@ -10,15 +10,15 @@ Projeto final das disciplinas Backend Frameworks e Projeto de Banco de Dados 202
 
 ### Enunciado
 
-TEMA LIVRE
-
-Construa uma API com, no mínimo, 5 tabelas.
-
-Construa CRUD total para as 5 tabelas.
-
-O seu projeto deve ter pelo menos 5 consultas extras (Além do CRUD)
-
-Front no Postman
+> TEMA LIVRE
+>
+> Construa uma API com, no mínimo, 5 tabelas.
+>
+> Construa CRUD total para as 5 tabelas.
+>
+> O seu projeto deve ter pelo menos 5 consultas extras (Além do CRUD)
+>
+> Front no Postman
 
 ---
 
@@ -33,8 +33,8 @@ Esta documentação fornece uma visão geral dos endpoints disponíveis e como u
 1. Clone o repositório:
 
    ```sh
-   git clone https://github.com/seu-usuario/nome-do-repositorio.git
-   cd nome-do-repositorio
+   git clone https://github.com/famgz/films-log-api.git
+   cd films-log-api
    ```
 
 2. Crie e ative um ambiente virtual (opcional, mas recomendado):
@@ -206,7 +206,7 @@ Esta documentação fornece uma visão geral dos endpoints disponíveis e como u
 
 ### Resenhas
 
-- **POST /user/<username>/film/<int:film_id>/review**
+- **POST /user/{username}/film/{film_id}/review**
 
   Cria uma nova resenha para um filme por um usuário.
 
@@ -220,7 +220,7 @@ Esta documentação fornece uma visão geral dos endpoints disponíveis e como u
   { "message": "Review adicionado com sucesso" }
   ```
 
-- **GET /user/<username>/film/<int:film_id>/review**
+- **GET /user/{username}/film/{film_id}/review**
 
   Obter uma resenha para um filme por um usuário.
 
@@ -234,7 +234,7 @@ Esta documentação fornece uma visão geral dos endpoints disponíveis e como u
   }
   ```
 
-- **PUT /user/<username>/film/<int:film_id>/review**
+- **PUT /user/{username}/film/{film_id}/review**
 
   Atualizar uma resenha para um filme por um usuário.
 
@@ -248,7 +248,7 @@ Esta documentação fornece uma visão geral dos endpoints disponíveis e como u
   { "message": "Review atualizado com sucesso" }
   ```
 
-- **DELETE /user/<username>/film/<int:film_id>/review**
+- **DELETE /user/{username}/film/{film_id}/review**
 
   Excluir uma resenha para um filme por um usuário.
 
@@ -260,7 +260,7 @@ Esta documentação fornece uma visão geral dos endpoints disponíveis e como u
 
 ### Avaliações
 
-- **POST /user/<username>/film/<int:film_id>/rating**
+- **POST /user/{username}/film/{film_id}/rating**
 
   Cria uma nova avaliação para um filme por um usuário.
 
@@ -274,7 +274,7 @@ Esta documentação fornece uma visão geral dos endpoints disponíveis e como u
   { "message": "Rating adicionado com sucesso" }
   ```
 
-- **GET /user/<username>/film/<int:film_id>/rating**
+- **GET /user/{username}/film/{film_id}/rating**
 
   Obter uma avaliação para um filme por um usuário.
 
@@ -288,7 +288,7 @@ Esta documentação fornece uma visão geral dos endpoints disponíveis e como u
   }
   ```
 
-- **PUT /user/<username>/film/<int:film_id>/rating**
+- **PUT /user/{username}/film/{film_id}/rating**
 
   Atualizar uma avaliação para um filme por um usuário.
 
@@ -302,7 +302,7 @@ Esta documentação fornece uma visão geral dos endpoints disponíveis e como u
   { "message": "Rating atualizado com sucesso" }
   ```
 
-- **DELETE /user/<username>/film/<int:film_id>/rating**
+- **DELETE /user/{username}/film/{film_id}/rating**
 
   Excluir uma avaliação para um filme por um usuário.
 
@@ -314,7 +314,7 @@ Esta documentação fornece uma visão geral dos endpoints disponíveis e como u
 
 ### Favoritos
 
-- **POST /user/<username>/film/<int:film_id>/favorite**
+- **POST /user/{username}/film/{film_id}/favorite**
 
   Adicionar um filme aos favoritos de um usuário.
 
@@ -324,7 +324,7 @@ Esta documentação fornece uma visão geral dos endpoints disponíveis e como u
   { "message": "Favorite adicionado com sucesso" }
   ```
 
-- **GET /user/<username>/film/<int:film_id>/favorite**
+- **GET /user/{username}/film/{film_id}/favorite**
 
   Obter um favorito para um filme por um usuário.
 
@@ -338,7 +338,7 @@ Esta documentação fornece uma visão geral dos endpoints disponíveis e como u
   }
   ```
 
-- **DELETE /user/<username>/film/<int:film_id>/favorite**
+- **DELETE /user/{username}/film/{film_id}/favorite**
 
   Excluir um favorito para um filme por um usuário.
 
