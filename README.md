@@ -37,13 +37,6 @@ Esta documentação fornece uma visão geral dos endpoints disponíveis e como u
    cd films-log-api
    ```
 
-2. Crie e ative um ambiente virtual (opcional, mas recomendado):
-
-   ```sh
-   python -m venv venv
-   source venv/bin/activate  # No Windows, use `venv\Scripts\activate`
-   ```
-
 3. Instale as dependências:
 
    ```sh
