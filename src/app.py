@@ -9,10 +9,18 @@ source_dir = Path(__file__).resolve().parent
 
 app = Flask(__name__)
 
+# dd credentials
 HOST = "localhost"
 USER = "root"
 PASSWORD = "admin"
 DATABASE = "films_log"
+
+# constraints
+FILM_TITLE_MAX_LENGTH = 100
+FILM_DIRECTOR_MAX_LENGTH = 50
+FILM_DURATION_MAX_MINUTES = 1000
+FILM_YEAR_MIN = 1900
+FILM_YEAR_MAX = 2050
 
 
 def get_db_connection():
@@ -102,9 +110,16 @@ def fetch_one_from_query(query):
             return cursor.fetchone()
 
 
+def fetch_all_from_query(query):
+    with get_db_connection() as conn:
+        with conn.cursor(dictionary=True) as cursor:
+            cursor.execute(query)
+            return cursor.fetchall()
+
+
 def find_user_by_username_or_email(username, email):
     return fetch_one_from_query(
-        f"SELECT * FROM user WHERE username = '{username}' OR email = {email}"
+        f"SELECT * FROM user WHERE username = '{username}' OR email = '{email}'"
     )
 
 
@@ -122,10 +137,46 @@ def get_film_by_id(film_id):
     return film
 
 
-""" Routes """
+def validate_film_title(title):
+    if not isinstance(title, str) or not title:
+        return None
+    return title[:FILM_TITLE_MAX_LENGTH]
 
 
-# Documentations
+def validate_film_director(director):
+    if not isinstance(director, str) or not director:
+        return None
+    return director[:FILM_DIRECTOR_MAX_LENGTH]
+
+
+def validate_film_year(year: str):
+    try:
+        year = int(year)
+    except:
+        return None
+
+    if not FILM_YEAR_MIN < year < FILM_YEAR_MAX:
+        return None
+
+    return year
+
+
+def validate_film_duration(duration: str):
+    try:
+        duration = int(duration)
+    except:
+        return None
+
+    if duration > FILM_DURATION_MAX_MINUTES:
+        return None
+
+    return duration
+
+
+""" --- Routes --- """
+
+
+# Documentation
 @app.route("/docs/en")
 def red_docs_en():
     return render_template("docs-en.html")
@@ -160,21 +211,25 @@ def create_user():
     return jsonify({"message": "User criado com sucesso"}), 201
 
 
-@app.route("/user/<int:id>", methods=["GET"])
+@app.route("/user/<username>", methods=["GET"])
 @handle_db_errors
-def get_user(id):
-    user = fetch_one_from_query(f"SELECT * FROM user WHERE id = {id}")
+def get_user(username):
+    user_id = get_user_id_by_username(username)
+
+    user = fetch_one_from_query(f"SELECT * FROM user WHERE id = {user_id}")
 
     if user:
         return jsonify(user)
     return jsonify({"message": "User não encontrado"}), 404
 
 
-@app.route("/user/<int:id>", methods=["PUT"])
+@app.route("/user/<username>", methods=["PUT"])
 @handle_db_errors
-def update_user(id):
+def update_user(username):
+
+    user_id = get_user_id_by_username(username)
+
     data = request.form
-    username = data.get("username")
     email = data.get("email")
     password = data.get("password")
 
@@ -187,16 +242,18 @@ def update_user(id):
         abort(404, "Usuário não encontrado")
 
     run_query(
-        f"UPDATE user SET username = '{username}', email = '{email}', password = '{password}' WHERE id = {id}"
+        f"UPDATE user SET email = '{email}', password = '{password}' WHERE id = {user_id}"
     )
 
     return jsonify({"message": "User atualizado com sucesso"})
 
 
-@app.route("/user/<int:id>", methods=["DELETE"])
+@app.route("/user/<username>", methods=["DELETE"])
 @handle_db_errors
-def delete_user(id):
-    run_query(f"DELETE FROM user WHERE id = {id}")
+def delete_user(username):
+    user_id = get_user_id_by_username(username)
+
+    run_query(f"DELETE FROM user WHERE id = {user_id}")
 
     return jsonify({"message": "User excluído com sucesso"})
 
@@ -206,10 +263,13 @@ def delete_user(id):
 @handle_db_errors
 def create_film():
     data = request.form
-    title = data.get("title")
-    year = data.get("year")
-    director = data.get("director")
-    duration = data.get("duration")
+    title = validate_film_title(data.get("title"))
+    year = validate_film_year(data.get("year"))
+    director = validate_film_director(data.get("director"))
+    duration = validate_film_duration(data.get("duration"))
+
+    if not (title and year and director and duration):
+        abort(400, "Todos os campos são obrigatórios")
 
     run_query(
         f"INSERT INTO film (title, year, director, duration) VALUES ('{title}', '{year}', '{director}', '{duration}')"
@@ -221,13 +281,31 @@ def create_film():
 @app.route("/film/all", methods=["GET"])
 @handle_db_errors
 def get_all_films():
-    conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
-    cursor.execute("SELECT * FROM film")
-    film = cursor.fetchall()
-    cursor.close()
-    conn.close()
-    return jsonify(film)
+    args = request.args
+
+    title = validate_film_title(args.get("title"))
+    year = validate_film_year(args.get("year"))
+    director = validate_film_director(args.get("director"))
+    duration = validate_film_duration(args.get("duration"))
+
+    # Base query
+    base_query = "SELECT * FROM film WHERE 1=1"
+    params = ""
+
+    if title:
+        params += f" AND title LIKE '%{title}%'"
+    if year:
+        params += f" AND year = {year}"
+    if director:
+        params += f" AND director LIKE '%{director}%'"
+    if duration:
+        params += f" AND duration = {duration}"
+
+    full_query = base_query + params
+
+    all_films = fetch_all_from_query(full_query)
+
+    return jsonify(all_films)
 
 
 @app.route("/film/<int:id>", methods=["GET"])
@@ -511,6 +589,14 @@ def delete_favorite(username, film_id):
     run_query(f"DELETE FROM favorite WHERE user_id = {user_id} AND film_id = {film_id}")
 
     return jsonify({"message": "Favorite excluído com sucesso"})
+
+
+# Complete queries
+@app.route("/user/<username>/film/all", methods=["POST"])
+def get_all_user_films(username):
+    user_id = get_user_id_by_username(username)["id"]
+
+    return
 
 
 if __name__ == "__main__":
