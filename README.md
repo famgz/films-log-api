@@ -52,9 +52,7 @@ Esta documentação fornece uma visão geral dos endpoints disponíveis e como u
 
 ### Acesse a documentação:
 
-- Em inglês: `/docs/en`
-
-- Em português: `/docs/pt`
+- Em português: `/docs`
 
 ## Endpoints
 
