@@ -177,12 +177,7 @@ def validate_film_duration(duration: str):
 
 
 # Documentation
-@app.route("/docs/en")
-def red_docs_en():
-    return render_template("docs-en.html")
-
-
-@app.route("/docs/pt")
+@app.route("/docs")
 def red_docs_pt():
     return render_template("docs-pt.html")
 
@@ -226,7 +221,6 @@ def get_user(username):
 @app.route("/user/<username>", methods=["PUT"])
 @handle_db_errors
 def update_user(username):
-
     user_id = get_user_id_by_username(username)
 
     data = request.form
@@ -256,6 +250,76 @@ def delete_user(username):
     run_query(f"DELETE FROM user WHERE id = {user_id}")
 
     return jsonify({"message": "User excluído com sucesso"})
+
+
+@app.route("/user/<username>/film/all", methods=["GET"])
+@handle_db_errors
+def get_user_all_films(username):
+    user_id = get_user_id_by_username(username)
+
+    query = f"""
+        SELECT
+            f.id AS film_id,
+            f.title AS film_title,
+            r.review,
+            ra.rating,
+            fa.favorite
+        FROM
+            film f
+        LEFT JOIN
+            review r ON f.id = r.film_id AND r.user_id = {user_id}
+        LEFT JOIN
+            rating ra ON f.id = ra.film_id AND ra.user_id = {user_id}
+        LEFT JOIN
+            favorite fa ON f.id = fa.film_id AND fa.user_id = {user_id}
+        WHERE
+            r.user_id = {user_id} OR ra.user_id = {user_id} OR fa.user_id = {user_id};
+    """
+
+    all_user_films = fetch_all_from_query(query)
+
+    # Convert favorite column to boolean
+    for film in all_user_films:
+        if film["favorite"] is not None:
+            film["favorite"] = bool(film["favorite"])
+
+    return all_user_films
+
+
+@app.route("/user/<username>/film/<int:film_id>", methods=["GET"])
+@handle_db_errors
+def get_user_film(username, film_id):
+    user_id = get_user_id_by_username(username)
+    get_film_by_id(film_id)
+
+    query = f"""
+        SELECT
+            f.id AS film_id,
+            f.title AS film_title,
+            r.review,
+            ra.rating,
+            fa.favorite
+        FROM
+            film f
+        LEFT JOIN
+            review r ON f.id = r.film_id AND r.user_id = {user_id}
+        LEFT JOIN
+            rating ra ON f.id = ra.film_id AND ra.user_id = {user_id}
+        LEFT JOIN
+            favorite fa ON f.id = fa.film_id AND fa.user_id = {user_id}
+        WHERE
+            r.user_id = {user_id} OR ra.user_id = {user_id} OR fa.user_id = {user_id}
+            AND
+            r.film_id = {film_id} OR ra.film_id = {film_id} OR fa.film_id = {film_id};
+    """
+
+    user_film = fetch_one_from_query(query)
+
+    # Convert favorite column to boolean
+    if user_film["favorite"] is not None:
+        user_film["favorite"] = bool(user_film["favorite"])
+
+    return user_film
 
 
 # Film CRUD
@@ -356,7 +420,9 @@ def create_review(username, film_id):
     if not review:
         abort(400, "Review não pode ser vazio.")
 
-    existing_review = get_review(user_id, film_id)
+    existing_review = fetch_one_from_query(
+        f"SELECT * FROM review WHERE user_id = {user_id} AND film_id = {film_id}"
+    )
 
     if existing_review:
         abort(409, "Review já existe para este usuário e filme")
@@ -371,7 +437,7 @@ def create_review(username, film_id):
 @app.route("/user/<username>/film/<int:film_id>/review", methods=["GET"])
 @handle_db_errors
 def get_review(username, film_id):
-    user_id = get_user_id_by_username(username)["id"]
+    user_id = get_user_id_by_username(username)
     get_film_by_id(film_id)
 
     review = fetch_one_from_query(
@@ -395,7 +461,9 @@ def update_review(username, film_id):
     if not review:
         abort(400, "Review não pode ser vazio.")
 
-    existing_review = get_review(user_id, film_id)
+    existing_review = fetch_one_from_query(
+        f"SELECT * FROM review WHERE user_id = {user_id} AND film_id = {film_id}"
+    )
 
     if not existing_review:
         abort(404, "Não foi encontrada Review para este usuário e filme")
@@ -410,10 +478,12 @@ def update_review(username, film_id):
 @app.route("/user/<username>/film/<int:film_id>/review", methods=["DELETE"])
 @handle_db_errors
 def delete_review(username, film_id):
-    user_id = get_user_id_by_username(username)["id"]
+    user_id = get_user_id_by_username(username)
     get_film_by_id(film_id)
 
-    existing_review = get_review(user_id, film_id)
+    existing_review = fetch_one_from_query(
+        f"SELECT * FROM review WHERE user_id = {user_id} AND film_id = {film_id}"
+    )
 
     if not existing_review:
         abort(404, "Não foi encontrada Review para este usuário e filme")
@@ -436,7 +506,9 @@ def create_rating(username, film_id):
     if not rating:
         abort(400, "Rating não pode ser vazio.")
 
-    existing_rating = get_rating(user_id, film_id)
+    existing_rating = fetch_one_from_query(
+        f"SELECT * FROM rating WHERE user_id = {user_id} AND film_id = {film_id}"
+    )
 
     if existing_rating:
         abort(409, "Rating já existe para este usuário e filme")
@@ -451,7 +523,7 @@ def create_rating(username, film_id):
 @app.route("/user/<username>/film/<int:film_id>/rating", methods=["GET"])
 @handle_db_errors
 def get_rating(username, film_id):
-    user_id = get_user_id_by_username(username)["id"]
+    user_id = get_user_id_by_username(username)
     get_film_by_id(film_id)
 
     rating = fetch_one_from_query(
@@ -475,7 +547,9 @@ def update_rating(username, film_id):
     if not rating:
         abort(400, "Rating não pode ser vazio.")
 
-    existing_rating = get_rating(user_id, film_id)
+    existing_rating = fetch_one_from_query(
+        f"SELECT * FROM rating WHERE user_id = {user_id} AND film_id = {film_id}"
+    )
 
     if not existing_rating:
         abort(404, "Não foi encontrada Rating para este usuário e filme")
@@ -490,7 +564,7 @@ def update_rating(username, film_id):
 @app.route("/user/<username>/film/<int:film_id>/rating", methods=["DELETE"])
 @handle_db_errors
 def delete_rating(username, film_id):
-    user_id = get_user_id_by_username(username)["id"]
+    user_id = get_user_id_by_username(username)
     get_film_by_id(film_id)
 
     run_query(f"DELETE FROM rating WHERE user_id = {user_id} AND film_id = {film_id}")
@@ -511,13 +585,15 @@ def create_favorite(username, film_id):
     if favorite is None:
         abort(400, "Favorite não pode ser vazio.")
 
-    existing_favorite = get_favorite(user_id, film_id)
+    existing_favorite = fetch_one_from_query(
+        f"SELECT * FROM favorite WHERE user_id = {user_id} AND film_id = {film_id}"
+    )
 
     if existing_favorite is not None:
         abort(409, "Favorite já existe para este usuário e filme")
 
     run_query(
-        f"INSERT INTO favorite (user_id, film_id, favorite) VALUES ('{user_id}', '{film_id}', '{favorite}')"
+        f"INSERT INTO favorite (user_id, film_id, favorite) VALUES ('{user_id}', '{film_id}', {favorite})"
     )
 
     return jsonify({"message": "Favorite adicionado com sucesso"}), 201
@@ -526,7 +602,7 @@ def create_favorite(username, film_id):
 @app.route("/user/<username>/film/<int:film_id>/favorite", methods=["GET"])
 @handle_db_errors
 def get_favorite(username, film_id):
-    user_id = get_user_id_by_username(username)["id"]
+    user_id = get_user_id_by_username(username)
     get_film_by_id(film_id)
 
     favorite = fetch_one_from_query(
@@ -534,6 +610,7 @@ def get_favorite(username, film_id):
     )
 
     if favorite is not None:
+        favorite["favorite"] = True if favorite["favorite"] else False
         return jsonify(favorite)
     return (
         jsonify({"message": "Não foi encontrada Favorite para este usuário e filme"}),
@@ -573,10 +650,12 @@ def update_favorite(username, film_id):
 @app.route("/user/<username>/film/<int:film_id>/favorite", methods=["DELETE"])
 @handle_db_errors
 def delete_favorite(username, film_id):
-    user_id = get_user_id_by_username(username)["id"]
+    user_id = get_user_id_by_username(username)
     get_film_by_id(film_id)
 
-    existing_favorite = get_favorite(user_id, film_id)
+    existing_favorite = fetch_one_from_query(
+        f"SELECT * FROM favorite WHERE user_id = {user_id} AND film_id = {film_id}"
+    )
 
     if existing_favorite is None:
         return (
@@ -589,14 +668,6 @@ def delete_favorite(username, film_id):
     run_query(f"DELETE FROM favorite WHERE user_id = {user_id} AND film_id = {film_id}")
 
     return jsonify({"message": "Favorite excluído com sucesso"})
-
-
-# Complete queries
-@app.route("/user/<username>/film/all", methods=["POST"])
-def get_all_user_films(username):
-    user_id = get_user_id_by_username(username)["id"]
-
-    return
 
 
 if __name__ == "__main__":
