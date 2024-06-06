@@ -37,13 +37,13 @@ Esta documentação fornece uma visão geral dos endpoints disponíveis e como u
    cd films-log-api
    ```
 
-3. Instale as dependências:
+2. Instale as dependências:
 
    ```sh
    pip install -r requirements.txt
    ```
 
-4. Execute a aplicação:
+3. Execute a aplicação:
 
    ```sh
    cd src
@@ -60,7 +60,7 @@ Esta documentação fornece uma visão geral dos endpoints disponíveis e como u
 
 ### Usuários
 
-- **POST /user**
+- **POST** `/user`
 
   Cria um novo usuário.
 
@@ -76,9 +76,9 @@ Esta documentação fornece uma visão geral dos endpoints disponíveis e como u
   { "message": "User criado com sucesso" }
   ```
 
-- **GET /user/<int:id>**
+- **GET** `/user/{username}`
 
-  Obter um usuário pelo ID.
+  Obter um usuário pelo username.
 
   **Resposta:**
 
@@ -91,7 +91,7 @@ Esta documentação fornece uma visão geral dos endpoints disponíveis e como u
   }
   ```
 
-- **PUT /user/<int:id>**
+- **PUT** `/user/{username}`
 
   Atualizar um usuário pelo ID.
 
@@ -107,9 +107,9 @@ Esta documentação fornece uma visão geral dos endpoints disponíveis e como u
   { "message": "User atualizado com sucesso" }
   ```
 
-- **DELETE /user/<int:id>**
+- **DELETE** `/user/{username}`
 
-  Excluir um usuário pelo ID.
+  Excluir um usuário pelo username.
 
   **Resposta:**
 
@@ -117,9 +117,45 @@ Esta documentação fornece uma visão geral dos endpoints disponíveis e como u
   { "message": "User excluído com sucesso" }
   ```
 
+- **GET** `/user/{username}/film/all`
+
+  Obter todos os filmes que o usuário possui algum registro.
+
+  **Resposta:**
+
+  ```json
+  [
+
+    {
+        "film_id": int,
+        "film_title": string,
+        "favorite": boolean,
+        "rating": number,
+        "review": string
+    }
+    ...
+  ]
+  ```
+
+- **GET** `/user/{username}/film/{film_id}`
+
+Obter informações de um filme com os registros do usuário.
+
+**Resposta:**
+
+```json
+   {
+       "film_id": int,
+       "film_title": string,
+       "favorite": boolean,
+       "rating": number,
+       "review": string
+   }
+```
+
 ### Filmes
 
-- **POST /film**
+- **POST** `/film`
 
   Cria um novo filme.
 
@@ -136,7 +172,7 @@ Esta documentação fornece uma visão geral dos endpoints disponíveis e como u
   { "message": "Filme adicionado com sucesso" }
   ```
 
-- **GET /film/all**
+- **GET** `/film/all`
 
   Obter todos os filmes.
 
@@ -155,7 +191,7 @@ Esta documentação fornece uma visão geral dos endpoints disponíveis e como u
   ]
   ```
 
-- **GET /film/<int:id>**
+- **GET** `/film/<int:id>`
 
   Obter um filme pelo ID.
 
@@ -171,7 +207,7 @@ Esta documentação fornece uma visão geral dos endpoints disponíveis e como u
   }
   ```
 
-- **PUT /film/<int:id>**
+- **PUT** `/film/<int:id>`
 
   Atualizar um filme pelo ID.
 
@@ -188,7 +224,7 @@ Esta documentação fornece uma visão geral dos endpoints disponíveis e como u
   { "message": "Filme atualizado com sucesso" }
   ```
 
-- **DELETE /film/<int:id>**
+- **DELETE** `/film/<int:id>`
 
   Excluir um filme pelo ID.
 
@@ -200,7 +236,7 @@ Esta documentação fornece uma visão geral dos endpoints disponíveis e como u
 
 ### Resenhas
 
-- **POST /user/{username}/film/{film_id}/review**
+- **POST** `/user/{username}/film/{film_id}/review`
 
   Cria uma nova resenha para um filme por um usuário.
 
@@ -214,7 +250,7 @@ Esta documentação fornece uma visão geral dos endpoints disponíveis e como u
   { "message": "Review adicionado com sucesso" }
   ```
 
-- **GET /user/{username}/film/{film_id}/review**
+- **GET** `/user/{username}/film/{film_id}/review`
 
   Obter uma resenha para um filme por um usuário.
 
@@ -228,7 +264,7 @@ Esta documentação fornece uma visão geral dos endpoints disponíveis e como u
   }
   ```
 
-- **PUT /user/{username}/film/{film_id}/review**
+- **PUT** `/user/{username}/film/{film_id}/review`
 
   Atualizar uma resenha para um filme por um usuário.
 
@@ -242,7 +278,7 @@ Esta documentação fornece uma visão geral dos endpoints disponíveis e como u
   { "message": "Review atualizado com sucesso" }
   ```
 
-- **DELETE /user/{username}/film/{film_id}/review**
+- **DELETE** `/user/{username}/film/{film_id}/review`
 
   Excluir uma resenha para um filme por um usuário.
 
@@ -254,7 +290,7 @@ Esta documentação fornece uma visão geral dos endpoints disponíveis e como u
 
 ### Avaliações
 
-- **POST /user/{username}/film/{film_id}/rating**
+- **POST** `/user/{username}/film/{film_id}/rating`
 
   Cria uma nova avaliação para um filme por um usuário.
 
@@ -268,7 +304,7 @@ Esta documentação fornece uma visão geral dos endpoints disponíveis e como u
   { "message": "Rating adicionado com sucesso" }
   ```
 
-- **GET /user/{username}/film/{film_id}/rating**
+- **GET** `/user/{username}/film/{film_id}/rating`
 
   Obter uma avaliação para um filme por um usuário.
 
@@ -282,7 +318,7 @@ Esta documentação fornece uma visão geral dos endpoints disponíveis e como u
   }
   ```
 
-- **PUT /user/{username}/film/{film_id}/rating**
+- **PUT** `/user/{username}/film/{film_id}/rating`
 
   Atualizar uma avaliação para um filme por um usuário.
 
@@ -296,7 +332,7 @@ Esta documentação fornece uma visão geral dos endpoints disponíveis e como u
   { "message": "Rating atualizado com sucesso" }
   ```
 
-- **DELETE /user/{username}/film/{film_id}/rating**
+- **DELETE** `/user/{username}/film/{film_id}/rating`
 
   Excluir uma avaliação para um filme por um usuário.
 
@@ -308,7 +344,7 @@ Esta documentação fornece uma visão geral dos endpoints disponíveis e como u
 
 ### Favoritos
 
-- **POST /user/{username}/film/{film_id}/favorite**
+- **POST** `/user/{username}/film/{film_id}/favorite`
 
   Adicionar um filme aos favoritos de um usuário.
 
@@ -318,7 +354,7 @@ Esta documentação fornece uma visão geral dos endpoints disponíveis e como u
   { "message": "Favorite adicionado com sucesso" }
   ```
 
-- **GET /user/{username}/film/{film_id}/favorite**
+- **GET** `/user/{username}/film/{film_id}/favorite`
 
   Obter um favorito para um filme por um usuário.
 
@@ -332,7 +368,7 @@ Esta documentação fornece uma visão geral dos endpoints disponíveis e como u
   }
   ```
 
-- **DELETE /user/{username}/film/{film_id}/favorite**
+- **DELETE** `/user/{username}/film/{film_id}/favorite`
 
   Excluir um favorito para um filme por um usuário.
 
