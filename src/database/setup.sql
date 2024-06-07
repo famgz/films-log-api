@@ -30,7 +30,7 @@ CREATE TABLE review (
 CREATE TABLE rating (
     user_id INT,
     film_id INT,
-    rating INT CHECK (rating BETWEEN 1 AND 10),
+    rating DECIMAL(3,1) CHECK (rating BETWEEN 1 AND 10),
     PRIMARY KEY (user_id, film_id),
     FOREIGN KEY (user_id) REFERENCES user(id),
     FOREIGN KEY (film_id) REFERENCES film(id)
