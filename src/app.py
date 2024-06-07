@@ -224,6 +224,7 @@ def update_user(username):
     user_id = get_user_id_by_username(username)
 
     data = request.form
+    username = data.get("username")
     email = data.get("email")
     password = data.get("password")
 
@@ -232,11 +233,13 @@ def update_user(username):
 
     user = find_user_by_username_or_email(username, email)
 
+    print(user)
+
     if not user:
         abort(404, "Usuário não encontrado")
 
     run_query(
-        f"UPDATE user SET email = '{email}', password = '{password}' WHERE id = {user_id}"
+        f"UPDATE user SET username = '{username}', email = '{email}', password = '{password}' WHERE id = {user_id}"
     )
 
     return jsonify({"message": "User atualizado com sucesso"})
@@ -469,7 +472,7 @@ def update_review(username, film_id):
         abort(404, "Não foi encontrada Review para este usuário e filme")
 
     run_query(
-        f"UPDATE review SET user_id = {user_id}, film_id = {film_id}, review = '{review}' WHERE id = {id}"
+        f"UPDATE review SET review = '{review}' WHERE user_id = {user_id} AND film_id = {film_id}"
     )
 
     return jsonify({"message": "Review atualizado com sucesso"})
@@ -555,7 +558,7 @@ def update_rating(username, film_id):
         abort(404, "Não foi encontrada Rating para este usuário e filme")
 
     run_query(
-        f"UPDATE rating SET user_id = {user_id}, film_id = {film_id}, rating = '{rating}' WHERE id = {id}"
+        f"UPDATE rating SET rating = '{rating}' WHERE user_id = {user_id} AND film_id = {film_id}"
     )
 
     return jsonify({"message": "Rating atualizado com sucesso"})
@@ -612,10 +615,7 @@ def get_favorite(username, film_id):
     if favorite is not None:
         favorite["favorite"] = True if favorite["favorite"] else False
         return jsonify(favorite)
-    return (
-        jsonify({"message": "Não foi encontrada Favorite para este usuário e filme"}),
-        404,
-    )
+    return abort(404, "Não foi encontrada Favorite para este usuário e filme")
 
 
 @app.route("/user/<username>/film/<int:film_id>/favorite", methods=["PUT"])
@@ -633,15 +633,10 @@ def update_favorite(username, film_id):
     existing_favorite = get_favorite(user_id, film_id)
 
     if not existing_favorite:
-        return (
-            jsonify(
-                {"message": "Não foi encontrada Favorite para este usuário e filme"}
-            ),
-            404,
-        )
+        return abort("Não foi encontrada Favorite para este usuário e filme")
 
     run_query(
-        f"UPDATE favorite SET user_id = {user_id}, film_id = {film_id}, favorite = '{favorite}' WHERE id = {id}"
+        f"UPDATE favorite SET favorite = '{favorite}' WHERE user_id = {user_id} AND film_id = {film_id}"
     )
 
     return jsonify({"message": "Favorite atualizado com sucesso"})
@@ -658,12 +653,7 @@ def delete_favorite(username, film_id):
     )
 
     if existing_favorite is None:
-        return (
-            jsonify(
-                {"message": "Não foi encontrada Favorite para este usuário e filme"}
-            ),
-            404,
-        )
+        return abort(404, "Não foi encontrada Favorite para este usuário e filme")
 
     run_query(f"DELETE FROM favorite WHERE user_id = {user_id} AND film_id = {film_id}")
 
